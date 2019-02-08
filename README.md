@@ -1,94 +1,96 @@
 # DbDeploy
 
-## Architecture Summary 
-DbUp is a database migration tool, which builds into a standard NuGet package and can be deployed using our standard Octopus deploy. It comprises of a C# console project and a TSQL script directory. 
-When run the application executes the scripts in sequence and logs the execution to a SchemaVersion table. If the application is run a second time the script names are compared to the SchemaVersion table, and only scripts that are different are executed. 
- 
-## NuGet Packages 
-Include the following NuGet packages: - 
-* dbup-sqlserver 
-* OctoPack 
+[![Build Status](https://dev.azure.com/Kf-GaryNewport/GaryNewport/_apis/build/status/Kf-GaryNewport.DbDeploy?branchName=master)](https://dev.azure.com/Kf-GaryNewport/GaryNewport/_build/latest?definitionId=1&branchName=master)
 
- 
-## Console Application 
-Replace the default console app with: 
+## Architecture SummaryÂ 
+DbUp is a database migration tool, which builds into a standard NuGet package and can be deployed using our standard Octopus deploy. It comprises of a C# console project and a TSQL script directory.Â 
+When run the application executes the scripts in sequence and logs the execution to a SchemaVersion table. If the application is run a second time the script names are compared to the SchemaVersion table, and only scripts that are different are executed.Â 
+Â 
+## NuGet PackagesÂ 
+Include the following NuGet packages: -Â 
+* dbup-sqlserverÂ 
+* OctoPackÂ 
+
+Â 
+## Console ApplicationÂ 
+Replace the default console app with:Â 
 ```csharp
- public class Program  
-    {  
-        static int Main()  
-        {  
-            var connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;  
-   
-            // Create Db if it doesn't exist  
-            EnsureDatabase.For.SqlDatabase(connectionString);  
-   
-            var upgrader =  
-                DeployChanges.To  
-                    .SqlDatabase(connectionString)  
-                    .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())  
-                    .LogToConsole()  
-                    .LogScriptOutput()  
-                    .Build();  
-   
-            var result = upgrader.PerformUpgrade();  
-   
-            if (!result.Successful)  
-            {  
-                Console.ForegroundColor = ConsoleColor.Red;  
-                Console.WriteLine(result.Error);  
-                Console.ResetColor();  
-#if DEBUG  
-                Console.ReadLine();  
-#endif  
-                return -1;  
-            }  
-   
-            Console.ForegroundColor = ConsoleColor.Green;  
-            Console.WriteLine("Success!");  
-            Console.ResetColor();  
-   
-#if DEBUG  
-            Console.ReadLine();  
-#endif  
-            return 0;  
-        }  
-    }  
+Â public class ProgramÂ Â 
+Â Â Â  {Â Â 
+Â Â Â Â Â Â Â  static int Main()Â Â 
+Â Â Â Â Â Â Â  {Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  var connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;Â Â 
+Â Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  // Create Db if it doesn't existÂ Â 
+Â Â Â Â Â Â Â Â Â Â Â  EnsureDatabase.For.SqlDatabase(connectionString);Â Â 
+Â Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  var upgrader =Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  DeployChanges.ToÂ Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  .SqlDatabase(connectionString)Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  .LogToConsole()Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  .LogScriptOutput()Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  .Build();Â Â 
+Â Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  var result = upgrader.PerformUpgrade();Â Â 
+Â Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  if (!result.Successful)Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  {Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  Console.ForegroundColor = ConsoleColor.Red;Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  Console.WriteLine(result.Error);Â Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  Console.ResetColor();Â Â 
+#if DEBUGÂ Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  Console.ReadLine();Â Â 
+#endifÂ Â 
+Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  return -1;Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  }Â Â 
+Â Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  Console.ForegroundColor = ConsoleColor.Green;Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  Console.WriteLine("Success!");Â Â 
+Â Â Â Â Â Â Â Â Â Â Â  Console.ResetColor();Â Â 
+Â Â Â 
+#if DEBUGÂ Â 
+Â Â Â Â Â Â Â Â Â Â Â  Console.ReadLine();Â Â 
+#endifÂ Â 
+Â Â Â Â Â Â Â Â Â Â Â  return 0;Â Â 
+Â Â Â Â Â Â Â  }Â Â 
+Â Â Â  }Â Â 
 ```
 
 
-## Note 
-* Load the connection string from an app.config file, so we can inject a deployment SQL target from Octopus. 
-* EnsureDatabase.For.SqlDatabase(connectionString); 
-	* Crates the Database in the conneciton string if it doesn’t exist. 
-* Console.ReadLine(); 
-	* If you are runnning a debug version in octopus then it will hang waiting for user input. 
-* .LogScriptOutput() 
-	* Displays the output from the script in the console. 
+## NoteÂ 
+* Load the connection string from an app.config file, so we can inject a deployment SQL target from Octopus.Â 
+* EnsureDatabase.For.SqlDatabase(connectionString);Â 
+	* Crates the Database in the conneciton string if it doesnâ€™t exist.Â 
+* Console.ReadLine();Â 
+	* If you are runnning a debug version in octopus then it will hang waiting for user input.Â 
+* .LogScriptOutput()Â 
+	* Displays the output from the script in the console.Â 
 
-## Scripts 
-* Create a scripts folder to contain your migraiton scripts 
-* Name the scripts appropiately, and try to limit each script to do one thing, it will help with debuging later. 
-* Scripts are executed in alphabeticcaly name order, so prefix the name with Script001…002 etc 
-* Change the property 'Build Action', on each script to Embedded Resource, so it will be included in the binary. 
-* Make your sql scripts Idempotent. 
-	* In general you should always put guards around your scripts so that checks are made to evaluate the elements existance, or not. 
-	* Turn Journaling off  
-		* .JournalTo(new NullJournal()) 
-		* By doing this every script will execute every time. 
-		* The system has no need for the schemaVersion table 
-  
- 
-## References 
-* DbUp 
-	* https://app.pluralsight.com/library/courses/deploying-databases-octopus/table-of-contents  
-	* https://dbup.github.io/  
-	* https://dbup.readthedocs.io/en/latest/  
-	* https://www.red-gate.com/simple-talk/dotnet/.net-framework/deploying-an-entity-framework-database-into-production/ 
-* ElasticUp 
-	* https://github.com/XPCegeka/ElasticUp 
-* EF SchemaCompare  
-	* https://github.com/JonPSmith/EfSchemaCompare 
-  
-  
-  
-  
+## ScriptsÂ 
+* Create a scripts folder to contain your migraiton scriptsÂ 
+* Name the scripts appropiately, and try to limit each script to do one thing, it will help with debuging later.Â 
+* Scripts are executed in alphabeticcaly name order, so prefix the name with Script001â€¦002 etcÂ 
+* Change the property 'Build Action', on each script to Embedded Resource, so it will be included in the binary.Â 
+* Make your sql scripts Idempotent.Â 
+	* In general you should always put guards around your scripts so that checks are made to evaluate the elements existance, or not.Â 
+	* Turn Journaling offÂ Â 
+		* .JournalTo(new NullJournal())Â 
+		* By doing this every script will execute every time.Â 
+		* The system has no need for the schemaVersion tableÂ 
+Â Â 
+Â 
+## ReferencesÂ 
+* DbUpÂ 
+	* https://app.pluralsight.com/library/courses/deploying-databases-octopus/table-of-contentsÂ Â 
+	* https://dbup.github.io/Â Â 
+	* https://dbup.readthedocs.io/en/latest/Â Â 
+	* https://www.red-gate.com/simple-talk/dotnet/.net-framework/deploying-an-entity-framework-database-into-production/Â 
+* ElasticUpÂ 
+	* https://github.com/XPCegeka/ElasticUpÂ 
+* EF SchemaCompareÂ Â 
+	* https://github.com/JonPSmith/EfSchemaCompareÂ 
+Â Â 
+Â Â 
+Â Â 
+Â Â 
